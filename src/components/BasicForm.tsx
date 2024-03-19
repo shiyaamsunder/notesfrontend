@@ -14,7 +14,6 @@ interface BasicFormProps {
 const BasicForm = ({ submitForm }: BasicFormProps) => {
   return (
     <div className="w-2/4">
-      
       <h1 className="text-2xl font-bold mb-1 text-red-500">Create a note</h1>
       <form action={submitForm} className="grid items-center gap-1">
         <label>Title</label>
