@@ -10,8 +10,10 @@
     "prepare": "husky && husky install"
   },
   "lint-staged": {
-    "./src/**/*": "prettier ./src --write --ignore-unknown && npm run lint",
-    "*.js": "eslint --cache --fix"
+    "src/.*{tsx, ts}": [
+      "prettier --write --ignore-unknown",
+      "npm run lint"
+    ]
   },
   "dependencies": {
     "next": "14.1.3",
