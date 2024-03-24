@@ -1,9 +1,13 @@
-import Link from "next/link";
+import NoteCard from "@notes/components/NoteCard";
+import { getAllNotes } from "@notes/utils";
 
-export default function Home() {
+export default async function Home() {
+  const allNotes = await getAllNotes();
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <Link href={"/notes/create"}>Create Note</Link>
+    <main className="flex flex-col items-center justify-between p-4 sm:p-24">
+      {allNotes.notes.map((note) => (
+        <NoteCard key={note.id} {...note} />
+      ))}
     </main>
   );
 }
