@@ -6,7 +6,7 @@ export default function NoteCard(note: Note) {
   return (
     <Link
       href={`/notes/${note.id}`}
-      className="p-3 m-3 border min-w-full sm:min-w-[520px] rounded-md shadow-sm"
+      className="p-3 m-3 border min-w-full  sm:min-w-[520px] rounded-md shadow-sm"
     >
       <Chip>#{note.tag}</Chip>
       <h1 className="text-2xl font-bold mb-3">{note.title}</h1>
