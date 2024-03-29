@@ -16,7 +16,7 @@ export default async function Note({ params }: { params: { id: string } }) {
         <ChevronLeft />
       </Link>
       <Chip>
-        <Editable text={`#${data.tag}`} id={data.id} name="tag" />
+        #<Editable text={`${data.tag}`} id={data.id} name="tag" />
       </Chip>
       <Editable
         className="text-3xl font-bold mb-3"

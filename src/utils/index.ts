@@ -1,20 +1,40 @@
-import { AllNoteResponse, NoteResponse } from "./types";
+import {
+  AllNoteResponse,
+  EditableNoteFields,
+  ErrorResponse,
+  Note,
+  NoteResponse,
+} from "./types";
 
-export async function getAllNotes(): Promise<AllNoteResponse> {
-  const res = await fetch(`http://localhost:8080/api/v0/notes/`, {
-    cache: "no-store",
-  });
+export async function getAllNotes(): Promise<Note[]> {
+  const res = await fetch(
+    `http://localhost:8080/api/v0/notes?sort=updatedAt&by=desc`,
+    {
+      cache: "no-cache",
+    },
+  );
 
-  if (!res.ok) {
-    throw new Error("Failed to fetch data");
+  const allNotesResponse: AllNoteResponse = await res.json();
+
+  if (res.ok) {
+    const notes = allNotesResponse?.notes;
+    if (notes) {
+      const unotes = notes.map((n) => ({
+        ...n,
+        createdAt: new Date(n.createdAt),
+        updatedAt: new Date(n.createdAt),
+      }));
+      return unotes;
+    } else {
+      return Promise.reject(new Error(`Error fetching your notes ...`));
+    }
   }
-  console.log("hello");
-  return res.json();
+  return Promise.reject(new Error(`Error fetching your notes ...`));
 }
 
 export async function getNote(id: string): Promise<NoteResponse> {
   const res = await fetch(`http://localhost:8080/api/v0/notes/${id}`, {
-    cache: "no-store",
+    next: { revalidate: 0 },
   });
 
   if (!res.ok) {
@@ -25,7 +45,10 @@ export async function getNote(id: string): Promise<NoteResponse> {
   return res.json();
 }
 
-export async function saveToDb<T>(id: string, data: any): Promise<T> {
+export async function editNote(
+  id: string,
+  data: EditableNoteFields,
+): Promise<NoteResponse> {
   const res = await fetch(`http://localhost:8080/api/v0/notes/edit/${id}`, {
     method: "PUT",
     body: JSON.stringify(data),
@@ -33,9 +56,14 @@ export async function saveToDb<T>(id: string, data: any): Promise<T> {
       "Content-Type": "application/json",
       "Access-Control-Allow-Origin": "http://localhost:3000",
     },
+    next: { revalidate: 0 },
   });
 
-  const saveToDbResponse = await res.json();
+  if (res.status >= 500) {
+    const errRes: ErrorResponse = await res.json();
+    return Promise.reject(new Error(errRes.message));
+  }
+  const saveToDbResponse: NoteResponse = await res.json();
 
   return saveToDbResponse;
 }

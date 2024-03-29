@@ -1,14 +1,11 @@
 "use client";
 
-import { saveToDb } from "@notes/utils";
-import {
-  ChangeEvent,
-  EventHandler,
-  FormEventHandler,
-  useRef,
-  useState,
-} from "react";
+import { editNote } from "@notes/utils";
+import { EditableNoteFieldsKeys } from "@notes/utils/types";
+import { useRef, useState } from "react";
 import ContentEditable, { ContentEditableEvent } from "react-contenteditable";
+import debounce from "lodash.debounce";
+import useDebounce from "@notes/utils/useDebounce";
 
 export default function Editable({
   text,
@@ -17,7 +14,7 @@ export default function Editable({
   name = "body",
 }: {
   id: string;
-  name: "title" | "body" | "tag";
+  name: EditableNoteFieldsKeys;
   text: string;
   className?: string;
 }) {
@@ -25,19 +22,22 @@ export default function Editable({
   const [state, setState] = useState({
     html: text,
   });
+  const _text = useRef(text);
 
   const handleChange = async (event: ContentEditableEvent) => {
-    setState({ html: event.target.value });
-    const res = await saveToDb(id, { [name]: event.target.value });
+    _text.current = event.target.value;
+    const res = await editNote(id, { [name]: _text.current });
+    console.log(res.message);
   };
+  const debouncedHandleChange = debounce(handleChange, 500);
 
   return (
     <ContentEditable
       className={`outline-none ${className}`}
       innerRef={contentEditable}
-      html={state.html}
+      html={_text.current}
       disabled={false}
-      onChange={handleChange}
+      onChange={debouncedHandleChange}
     />
   );
 }
