@@ -9,9 +9,7 @@ import {
 export async function getAllNotes(): Promise<Note[]> {
   const res = await fetch(
     `http://localhost:8080/api/v0/notes?sort=updatedAt&by=desc`,
-    {
-      cache: "no-cache",
-    },
+    {},
   );
 
   const allNotesResponse: AllNoteResponse = await res.json();
@@ -34,7 +32,7 @@ export async function getAllNotes(): Promise<Note[]> {
 
 export async function getNote(id: string): Promise<NoteResponse> {
   const res = await fetch(`http://localhost:8080/api/v0/notes/${id}`, {
-    next: { revalidate: 0 },
+    cache: "no-store",
   });
 
   if (!res.ok) {
